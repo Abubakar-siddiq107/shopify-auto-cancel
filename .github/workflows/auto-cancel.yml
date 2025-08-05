@@ -22,5 +22,5 @@ jobs:
       - name: Run cancel script
         run: node cancel.js
         env:
-          SHOPIFY_STORE: your-store.myshopify.com
+          SHOPIFY_STORE: ${{ secrets.SHOPIFY_STORE }}
           SHOPIFY_TOKEN: ${{ secrets.SHOPIFY_TOKEN }}
