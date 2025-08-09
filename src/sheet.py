@@ -1,38 +1,28 @@
 import gspread
+import json
 from oauth2client.service_account import ServiceAccountCredentials
 from datetime import datetime
+import os
 
-# Google Sheets setup
-SCOPE = ["https://spreadsheets.google.com/feeds", "https://www.googleapis.com/auth/drive"]
-CREDS = ServiceAccountCredentials.from_json_keyfile_name("credentials.json", SCOPE)
-CLIENT = gspread.authorize(CREDS)
+def get_sheet():
+    scope = ["https://spreadsheets.google.com/feeds", "https://www.googleapis.com/auth/drive"]
+    creds_json = json.loads(os.environ['GOOGLE_SERVICE_ACCOUNT'])
+    creds = ServiceAccountCredentials.from_json_keyfile_dict(creds_json, scope)
+    client = gspread.authorize(creds)
+    return client.open_by_key(os.environ['GOOGLE_SHEET_ID']).sheet1
 
-# Replace with your actual sheet name
-SHEET_NAME = "Shopify Order Cancellations"
-SHEET = CLIENT.open(SHEET_NAME).sheet1
-
-
-def log_cancellations(cancellations):
-    """
-    Logs canceled orders to Google Sheets.
-
-    Args:
-        cancellations (list of dict): Each dict should have
-            'order_id', 'customer_name', 'reason', and optionally 'cancelled_at'.
-    """
-    if not cancellations:
-        print("No cancellations to log.")
-        return
-
+def log_cancellations(store_name, cancelled_orders):
+    sheet = get_sheet()
     rows = []
-    for c in cancellations:
+    for order in cancelled_orders:
         rows.append([
-            c.get("order_id", ""),
-            c.get("customer_name", ""),
-            c.get("reason", ""),
-            c.get("cancelled_at", datetime.utcnow().strftime("%Y-%m-%d %H:%M:%S"))
+            store_name,
+            order['order_number'],   # human-facing order name e.g. #1001
+            order['name'],
+            order['phone'],
+            order['order_date'],
+            datetime.now().strftime('%Y-%m-%d')
         ])
-
-    # Append in one batch for efficiency
-    SHEET.append_rows(rows, value_input_option="USER_ENTERED")
-    print(f"✅ Synced {len(rows)} cancellations to Google Sheet")
+    if rows:
+        sheet.append_rows(rows, value_input_option="USER_ENTERED")
+        print(f"✅ Synced {len(rows)} orders to Google Sheet")
