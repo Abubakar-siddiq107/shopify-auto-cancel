@@ -10,28 +10,27 @@ jobs:
     runs-on: ubuntu-latest
 
     steps:
-    - name: Checkout
-      uses: actions/checkout@v3
+      - name: Checkout
+        uses: actions/checkout@v3
 
-    - name: Set up Python
-      uses: actions/setup-python@v4
-      with:
-        python-version: '3.11'
+      - name: Set up Python
+        uses: actions/setup-python@v4
+        with:
+          python-version: '3.11'
 
-    - name: Install dependencies
-      run: |
-        pip install -r requirements.txt
+      - name: Install dependencies
+        run: |
+          pip install -r requirements.txt
 
-    - name: Run cancellation script
-    env:
-        SHOP1_DOMAIN: ${{ secrets.SHOP1_DOMAIN }}
-        SHOP1_TOKEN: ${{ secrets.SHOP1_TOKEN }}
-        SHOP1_NAME: ${{ secrets.SHOP1_NAME }}
-        SHOP2_DOMAIN: ${{ secrets.SHOP2_DOMAIN }}
-        SHOP2_TOKEN: ${{ secrets.SHOP2_TOKEN }}
-        SHOP2_NAME: ${{ secrets.SHOP2_NAME }}
-        GOOGLE_SERVICE_ACCOUNT: ${{ secrets.GOOGLE_SERVICE_ACCOUNT }}
-        GOOGLE_SHEET_ID: ${{ secrets.GOOGLE_SHEET_ID }}
-
-      run: |
-        python src/cancel_orders.py
+      - name: Run cancellation script
+        env:
+          SHOP1_DOMAIN: ${{ secrets.SHOP1_DOMAIN }}
+          SHOP1_TOKEN: ${{ secrets.SHOP1_TOKEN }}
+          SHOP1_NAME: ${{ secrets.SHOP1_NAME }}
+          SHOP2_DOMAIN: ${{ secrets.SHOP2_DOMAIN }}
+          SHOP2_TOKEN: ${{ secrets.SHOP2_TOKEN }}
+          SHOP2_NAME: ${{ secrets.SHOP2_NAME }}
+          GOOGLE_SERVICE_ACCOUNT: ${{ secrets.GOOGLE_SERVICE_ACCOUNT }}
+          GOOGLE_SHEET_ID: ${{ secrets.GOOGLE_SHEET_ID }}
+        run: |
+          python src/cancel_orders.py
