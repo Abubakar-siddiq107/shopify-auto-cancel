@@ -23,12 +23,15 @@ jobs:
         pip install -r requirements.txt
 
     - name: Run cancellation script
-      env:
+    env:
         SHOP1_DOMAIN: ${{ secrets.SHOP1_DOMAIN }}
         SHOP1_TOKEN: ${{ secrets.SHOP1_TOKEN }}
+        SHOP1_NAME: ${{ secrets.SHOP1_NAME }}
         SHOP2_DOMAIN: ${{ secrets.SHOP2_DOMAIN }}
         SHOP2_TOKEN: ${{ secrets.SHOP2_TOKEN }}
+        SHOP2_NAME: ${{ secrets.SHOP2_NAME }}
         GOOGLE_SERVICE_ACCOUNT: ${{ secrets.GOOGLE_SERVICE_ACCOUNT }}
         GOOGLE_SHEET_ID: ${{ secrets.GOOGLE_SHEET_ID }}
+
       run: |
         python src/cancel_orders.py
