@@ -17,12 +17,13 @@ def log_cancellations(store_name, cancelled_orders):
     for order in cancelled_orders:
         rows.append([
             store_name,
-            order['order_number'],   # human-facing order name e.g. #1001
+            order['order_number'],   # Shopify order name (e.g. #1001)
             order['name'],
             order['phone'],
             order['order_date'],
             datetime.now().strftime('%Y-%m-%d')
         ])
     if rows:
+        # This will always append new rows to the bottom of the sheet
         sheet.append_rows(rows, value_input_option="USER_ENTERED")
-        print(f"✅ Synced {len(rows)} orders to Google Sheet")
+        print(f"✅ Appended {len(rows)} cancellations for {store_name}")
