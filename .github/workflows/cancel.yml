@@ -2,7 +2,7 @@ name: Cancel Old Unfulfilled Orders
 
 on:
   schedule:
-    - cron: '0 4 * * *'  # Runs every day at 9:30 AM IST
+    - cron: '0 4 * * 3-5'  # Runs every Wed, Thu, Fri at 9:30 AM IST
   workflow_dispatch:
 
 jobs:
