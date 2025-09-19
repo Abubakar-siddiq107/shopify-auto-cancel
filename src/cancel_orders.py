@@ -88,14 +88,24 @@ def process_store(domain_env_key, token_env_key, name_env_key):
         success = cancel_order(shop, token, order_id)
         if success:
             customer_name, phone, address, products = extract_order_details(order)
+
+            # flatten products into a readable string
+            product_str = "; ".join([
+                f"{p['quantity']}x {p['title']} ({p['variant'] or 'Default'})"
+                for p in products
+            ]) if products else "None"
+
             cancelled.append({
-                'order_number': order.get('name', str(order_id)),  # human-facing order number like #1001
+                'order_number': order.get('name', str(order_id)),  # Shopify human-facing order number (#1001 etc.)
                 'name': customer_name,
                 'phone': phone,
+                'address': address,
+                'products': product_str,
                 'order_date': order.get('created_at', '')[:10]
             })
             print(f"Cancelled {order.get('name','(no-name)')} for {display_name}")
 
+    # <-- this must be outside the loop
     if cancelled:
         log_cancellations(display_name, cancelled)
     else:
