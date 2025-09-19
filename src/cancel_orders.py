@@ -87,7 +87,7 @@ def process_store(domain_env_key, token_env_key, name_env_key):
             continue
         success = cancel_order(shop, token, order_id)
         if success:
-            customer_name, phone = extract_customer_info(order)
+            customer_name, phone, address, products = extract_order_details(order)
             cancelled.append({
                 'order_number': order.get('name', str(order_id)),  # human-facing order number like #1001
                 'name': customer_name,
