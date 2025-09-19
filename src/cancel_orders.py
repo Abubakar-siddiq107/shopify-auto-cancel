@@ -26,7 +26,8 @@ def cancel_order(shop, token, order_id):
     r = requests.post(url, headers=headers)
     return r.status_code == 200
 
-def extract_customer_info(order):
+def extract_order_details(order):
+    # --- Customer name & phone ---
     customer_name = "Unknown"
     phone = "Unknown"
 
@@ -37,22 +38,35 @@ def extract_customer_info(order):
         customer_name = (first + ' ' + last).strip() or customer_name
         phone = cust.get('phone') or phone
 
-    # fallback to shipping or billing address
-    if (customer_name == "Unknown" or phone == "Unknown"):
-        ship = order.get('shipping_address') or {}
-        bill = order.get('billing_address') or {}
-        if ship:
-            name = " ".join(filter(None, [ship.get('first_name', ''), ship.get('last_name', '')])).strip()
-            customer_name = name or customer_name
-            phone = ship.get('phone') or phone
-        if (customer_name == "Unknown" or phone == "Unknown") and bill:
-            name = " ".join(filter(None, [bill.get('first_name', ''), bill.get('last_name', '')])).strip()
-            customer_name = name or customer_name
-            phone = bill.get('phone') or phone
+    # fallback to shipping/billing
+    ship = order.get('shipping_address') or {}
+    bill = order.get('billing_address') or {}
 
-    # final fallback to order-level phone field
-    phone = phone or order.get('phone') or "Unknown"
-    return customer_name, phone
+    if customer_name == "Unknown":
+        customer_name = ship.get('name') or bill.get('name') or customer_name
+    if phone == "Unknown":
+        phone = ship.get('phone') or bill.get('phone') or order.get('phone') or "Unknown"
+
+    # --- Address ---
+    address = "Unknown"
+    if ship:
+        parts = [ship.get('address1', ''), ship.get('address2', ''), ship.get('city', ''), ship.get('province', ''), ship.get('country', ''), ship.get('zip', '')]
+        address = ", ".join([p for p in parts if p])
+    elif bill:
+        parts = [bill.get('address1', ''), bill.get('address2', ''), bill.get('city', ''), bill.get('province', ''), bill.get('country', ''), bill.get('zip', '')]
+        address = ", ".join([p for p in parts if p])
+
+    # --- Products ---
+    products = []
+    for item in order.get('line_items', []):
+        products.append({
+            "title": item.get("title"),
+            "sku": item.get("sku"),
+            "variant": item.get("variant_title"),
+            "quantity": item.get("quantity"),
+        })
+
+    return customer_name, phone, address, products
 
 def process_store(domain_env_key, token_env_key, name_env_key):
     shop = os.environ.get(domain_env_key)
