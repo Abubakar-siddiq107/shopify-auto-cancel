@@ -20,10 +20,11 @@ def log_cancellations(store_name, cancelled_orders):
             order['order_number'],   # Shopify order name (e.g. #1001)
             order['name'],
             order['phone'],
+            order['address'],
+            order['products'],
             order['order_date'],
-            datetime.now().strftime('%Y-%m-%d')
+            datetime.now().strftime('%Y-%m-%d')  # logged_at timestamp
         ])
     if rows:
-        # This will always append new rows to the bottom of the sheet
         sheet.append_rows(rows, value_input_option="USER_ENTERED")
         print(f"✅ Appended {len(rows)} cancellations for {store_name}")
